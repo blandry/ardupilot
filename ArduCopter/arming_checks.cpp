@@ -14,15 +14,70 @@ const AP_Param::GroupInfo AP_Arming_Copter::var_info[] = {
     AP_GROUPEND
 };
 
-/*
-  additional arming checks for copter
- */
+// performs pre-arm checks. expects to be called at 1hz.
+void AP_Arming_Copter::update_arming_checks()
+{
+    // perform pre-arm checks & display failures every 30 seconds
+    static uint8_t pre_arm_display_counter = PREARM_DISPLAY_PERIOD/2;
+    pre_arm_display_counter++;
+    if (pre_arm_display_counter >= PREARM_DISPLAY_PERIOD) {
+        pre_arm_checks(true);
+        pre_arm_display_counter = 0;
+    }else{
+        pre_arm_checks(false);
+    }
+}
+
+// performs pre-arm checks and arming checks
+bool AP_Arming_Copter::all_arming_checks_passing(bool arming_from_gcs)
+{
+  
+    return (pre_arm_checks(true) && arm_checks(true, arming_from_gcs));
+}
+
+// perform pre-arm checks and set ap.pre_arm_check flag
+//  return true if the checks pass successfully
 bool AP_Arming_Copter::pre_arm_checks(bool report)
 {
-    // call parent class checks
-    bool ret = AP_Arming::pre_arm_checks(report);
+    // exit immediately if already armed
+    if (copter.motors.armed()) {
+        AP_Notify::flags.pre_arm_check = true;
+        return true;
+    }
 
-    return ret;
+    // set notify LEDs based on gps checks
+    AP_Notify::flags.pre_arm_gps_check = gps_checks(false);
+
+    // call parent class checks
+    if (!AP_Arming::pre_arm_checks(report)) {
+        AP_Notify::flags.pre_arm_check = false;
+        return false;
+    }
+
+    AP_Notify::flags.pre_arm_check = true;
+    return true;
+}
+
+// arm_checks - perform final checks before arming
+//  always called just before arming.  Return true if ok to arm
+//  has side-effect that logging is started
+bool AP_Arming_Copter::arm_checks(bool report, bool arming_from_gcs)
+{
+#if LOGGING_ENABLED == ENABLED
+    // start dataflash
+    copter.start_logging();
+#endif
+
+    // always check if the current mode allows arming
+    if (!copter.mode_allows_arming(copter.control_mode, arming_from_gcs)) {
+        if (report) {
+            GCS_MAVLINK::send_statustext_all(MAV_SEVERITY_CRITICAL,"Arm: Mode not armable");
+        }
+        return false;
+    }
+
+    // if we've gotten this far all is ok
+    return true;
 }
 
 AP_Arming::ArmingCheckResult AP_Arming_Copter::barometer_checks(bool report)
