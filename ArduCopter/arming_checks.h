@@ -19,8 +19,8 @@
 class AP_Arming_Copter : public AP_Arming
 {
 public:
-    AP_Arming_Copter(const AP_AHRS &ahrs_ref, const AP_Baro &baro, Compass &compass, const enum HomeState &home_state) :
-        AP_Arming(ahrs_ref, baro, compass, home_state)
+    AP_Arming_Copter(const AP_AHRS &ahrs_ref, const AP_Baro &baro, Compass &compass, const AP_BattMonitor &battery, const enum HomeState &home_state) :
+        AP_Arming(ahrs_ref, baro, compass, battery, home_state)
     {
             AP_Param::setup_object_defaults(this, var_info);
     }

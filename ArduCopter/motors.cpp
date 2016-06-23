@@ -133,7 +133,7 @@ bool Copter::init_arm_motors(bool arming_from_gcs)
     in_arm_motors = true;
 
     // run pre-arm-checks and display failures
-    if (!all_arming_checks_passing(arming_from_gcs)) {
+    if(!pre_arm_checks(true) || !arm_checks(true, arming_from_gcs)) {
         AP_Notify::events.arming_failed = true;
         in_arm_motors = false;
         return false;
@@ -248,7 +248,7 @@ bool Copter::arm_checks(bool display_failure, bool arming_from_gcs)
     // always check if the current mode allows arming
     if (!mode_allows_arming(control_mode, arming_from_gcs)) {
         if (display_failure) {
-            gcs_send_text_P(MAV_SEVERITY_CRITICAL,PSTR("Arm: Mode not armable"));
+            gcs_send_text(MAV_SEVERITY_CRITICAL,"Arm: Mode not armable");
         }
         return false;
     }
