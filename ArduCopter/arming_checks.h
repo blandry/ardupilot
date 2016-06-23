@@ -25,7 +25,13 @@ public:
             AP_Param::setup_object_defaults(this, var_info);
     }
 
+    void update_arming_checks();
+
+    bool all_arming_checks_passing(bool arming_from_gcs);
+
     bool pre_arm_checks(bool report);
+
+    bool arm_checks(bool report, bool arming_from_gcs);
 
     ArmingCheckResult barometer_checks(bool report);
 
