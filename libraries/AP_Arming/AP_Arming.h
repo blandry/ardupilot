@@ -13,10 +13,27 @@ public:
         ARMING_CHECK_NONE       = 0x0000,
         ARMING_CHECK_ALL        = 0x0001,
         ARMING_CHECK_BARO       = 0x0002,
+        
         ARMING_CHECK_COMPASS    = 0x0004,
+        ARMING_CHECK_COMPASS_2  = 0x0004,
+        ARMING_CHECK_COMPASS_3  = 0x0004,
+        ARMING_CHECK_COMPASS_4  = 0x0004,
+        ARMING_CHECK_COMPASS_5  = 0x0004,
+        ARMING_CHECK_COMPASS_6  = 0x0004,
+        ARMING_CHECK_COMPASS_7  = 0x0004,
+        
         ARMING_CHECK_GPS        = 0x0008,
+        
         ARMING_CHECK_INS        = 0x0010,
-        ARMING_CHECK_PARAMETERS = 0x0020,
+        ARMING_CHECK_INS_2      = 0x0020,
+        ARMING_CHECK_INS_3      = 0x0040,
+        ARMING_CHECK_INS_4      = 0x0080,
+        ARMING_CHECK_INS_5      = 0x0100,
+        ARMING_CHECK_INS_6      = 0x0200,
+        ARMING_CHECK_INS_7      = 0x0400,
+        
+        ARMING_CHECK_PARAMETERS = 0x0800,
+        
         ARMING_CHECK_RC         = 0x0040,
         ARMING_CHECK_VOLTAGE    = 0x0080,
         ARMING_CHECK_BATTERY    = 0x0100,
@@ -111,29 +128,27 @@ protected:
 
     void set_enabled_checks(uint16_t);
 
-    virtual ArmingCheckResult barometer_checks(bool report);
+    virtual ArmingCheckResult barometer_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    ArmingCheckResult airspeed_checks(bool report);
+    ArmingCheckResult airspeed_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    ArmingCheckResult logging_checks(bool report);
+    ArmingCheckResult logging_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    virtual ArmingCheckResult ins_checks(bool report);
+    virtual ArmingCheckResult ins_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    virtual ArmingCheckResult parameter_checks(bool report);
+    virtual ArmingCheckResult parameter_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    virtual ArmingCheckResult compass_checks(bool report);
+    virtual ArmingCheckResult compass_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    ArmingCheckResult battery_checks(bool report);
+    ArmingCheckResult battery_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    ArmingCheckResult hardware_safety_check(bool report);
+    ArmingCheckResult hardware_safety_check(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    ArmingCheckResult board_voltage_checks(bool report);
+    ArmingCheckResult board_voltage_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    virtual ArmingCheckResult manual_transmitter_checks(bool report);
+    virtual ArmingCheckResult manual_transmitter_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 
-    virtual ArmingCheckResult terrain_checks(bool report);
+    virtual ArmingCheckResult terrain_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
     
-    virtual ArmingCheckResult rallypoint_checks(bool report);
-
-    void update_enabled_passed_state(uint32_t check_id, ArmingCheckResult res, uint64_t &enabled_bitmask, uint64_t &passed_bitmask);
+    virtual ArmingCheckResult rallypoint_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks);
 };
