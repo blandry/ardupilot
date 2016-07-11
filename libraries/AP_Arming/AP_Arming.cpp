@@ -104,7 +104,7 @@ void AP_Arming::set_enabled_checks(uint16_t ap)
     checks_to_perform = ap;
 }
 
-AP_Arming::ArmingCheckResult AP_Arming::barometer_checks(bool report, uint64_t enabled_checks, uint64_t passed_checks)
+AP_Arming::ArmingCheckResult AP_Arming::barometer_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks)
 {
     if (!(checks_to_perform & ARMING_CHECK_ALL) && !(checks_to_perform & ARMING_CHECK_BARO)) {
         enabled_checks &= ~ARMING_CHECK_BARO;
@@ -177,15 +177,15 @@ AP_Arming::ArmingCheckResult AP_Arming::ins_checks(bool report, uint64_t &enable
     bool group_contains_failure = false;
     bool group_is_disabled = true;
     
-    if ((checks_to_perform & ARMING_CHECK_ALL) || (checks_to_perform & ARMING_CHECK_INS_1)) {
-        enabled_checks |= ARMING_CHECK_INS_1;
-        passed_checks |= ARMING_CHECK_INS_1;
+    if ((checks_to_perform & ARMING_CHECK_ALL) || (checks_to_perform & ARMING_CHECK_INS)) {
+        enabled_checks |= ARMING_CHECK_INS;
+        passed_checks |= ARMING_CHECK_INS;
         group_is_disabled = false;
         if (!ins.get_gyro_health_all()) {
             if (report) {
                 GCS_MAVLINK::send_statustext_all(MAV_SEVERITY_CRITICAL, "PreArm: gyros not healthy");
             }
-            passed_checks &= ~ARMING_CHECK_INS_1;
+            passed_checks &= ~ARMING_CHECK_INS;
             group_contains_failure = true;
         }
     }
@@ -333,8 +333,8 @@ AP_Arming::ArmingCheckResult AP_Arming::parameter_checks(bool report, uint64_t &
 AP_Arming::ArmingCheckResult AP_Arming::compass_checks(bool report, uint64_t &enabled_checks, uint64_t &passed_checks)
 {
   
-    group_contains_failure = false;
-    group_is_disabled = true;
+    bool group_contains_failure = false;
+    bool group_is_disabled = true;
 
     if (!(checks_to_perform & ARMING_CHECK_ALL) && !(checks_to_perform & ARMING_CHECK_COMPASS)) {
         enabled_checks |= ARMING_CHECK_COMPASS;
@@ -507,7 +507,7 @@ AP_Arming::ArmingCheckResult AP_Arming::battery_checks(bool report, uint64_t &en
     return ARMING_CHECK_PASSED;
 }
 
-AP_Arming::ArmingCheckResult AP_Arming::hardware_safety_check(bool report, uint64_t enabled_checks, uint64_t passed_checks)
+AP_Arming::ArmingCheckResult AP_Arming::hardware_safety_check(bool report, uint64_t &enabled_checks, uint64_t &passed_checks)
 {
   
     // report that the safety switch check is enabled
